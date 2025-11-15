@@ -4,52 +4,83 @@ This Python script transcribes MP3 audio files using Google Cloud Speech-to-Text
 
 ## Features
 
-- Transcribes MP3 audio files with **Chirp 3 model** for superior accuracy
-- Identifies different speakers in the audio
-- Segments transcription by speaker
-- Batch recognition for long audio files (up to 8 hours)
-- Saves transcription to a text file
-- Supports automatic punctuation
-- Uses Google Cloud Storage for processing large files
-- Uses Application Default Credentials (ADC) for secure authentication
+- 🎬 **Extracts audio from video files** (MP4, AVI, MOV, MKV, etc.)
+- 🎵 **Transcribes audio files** with **Chirp 3 model** for superior accuracy
+- 👥 **Identifies different speakers** in the audio (speaker diarization)
+- 📝 **Segments transcription by speaker**
+- ⏱️ **Batch recognition** for long audio files (up to 8 hours)
+- 💾 **Saves transcription to text file**
+- 🔤 **Automatic punctuation** for natural reading
+- ☁️ **Uses Google Cloud Storage** for processing large files
+- 🔐 **Secure authentication** with Application Default Credentials (ADC)
+- 🏗️ **Modular architecture** with separate services for audio extraction and transcription
 
 ## Quick Start
 
 For users who already have Google Cloud set up:
 
 ```bash
-# 1. Install dependencies
+# 1. Install FFmpeg (macOS)
+brew install ffmpeg
+
+# 2. Install Python dependencies
 pip install -r requirements.txt
 
-# 2. Authenticate with Google Cloud
+# 3. Authenticate with Google Cloud
 gcloud auth application-default login
 gcloud auth application-default set-quota-project YOUR_PROJECT_ID
 
-# 3. Grant permissions
+# 4. Grant permissions
 gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
     --member='user:YOUR_EMAIL@gmail.com' \
     --role='roles/speech.admin'
 
-# 4. Create .env file
+# 5. Create .env file
 echo "GCS_BUCKET_NAME=your-bucket-name" > .env
 echo "GOOGLE_PROJECT_ID=your-project-id" >> .env
 
-# 5. Run the script
-python transcribe_audio.py your-audio.mp3
+# 6. Run the script
+python main.py video.mp4
+# or
+python main.py audio.mp3
 ```
 
 ## Prerequisites
 
-1. **Google Cloud Account**: You need a Google Cloud account with billing enabled
-2. **Google Cloud SDK**: Install the `gcloud` CLI tool for authentication
-3. **Speech-to-Text V2 API**: Enable the Cloud Speech-to-Text V2 API in your project
-4. **Cloud Storage**: Create a Google Cloud Storage bucket for audio files and transcripts
-5. **Python 3.7+**: Make sure you have Python 3.7 or higher installed
-6. **IAM Permissions**: Your Google account needs `roles/speech.admin` and `roles/storage.objectAdmin`
+1. **Python 3.7+**: Make sure you have Python 3.7 or higher installed
+2. **FFmpeg**: Required for extracting audio from video files
+3. **Google Cloud Account**: You need a Google Cloud account with billing enabled
+4. **Google Cloud SDK**: Install the `gcloud` CLI tool for authentication
+5. **Speech-to-Text V2 API**: Enable the Cloud Speech-to-Text V2 API in your project
+6. **Cloud Storage**: Create a Google Cloud Storage bucket for audio files and transcripts
+7. **IAM Permissions**: Your Google account needs `roles/speech.admin` and `roles/storage.objectAdmin`
 
 ## Setup Instructions
 
-### 1. Install Dependencies
+### 1. Install FFmpeg
+
+FFmpeg is required to extract audio from video files.
+
+**macOS:**
+```bash
+brew install ffmpeg
+```
+
+**Ubuntu/Debian:**
+```bash
+sudo apt-get update
+sudo apt-get install ffmpeg
+```
+
+**Windows:**
+Download from https://ffmpeg.org/download.html and add to PATH
+
+**Verify installation:**
+```bash
+ffmpeg -version
+```
+
+### 2. Install Python Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -60,7 +91,7 @@ Or install individually:
 pip install google-cloud-speech google-cloud-storage google-api-core python-dotenv
 ```
 
-### 2. Install Google Cloud SDK
+### 3. Install Google Cloud SDK
 
 If you don't have the `gcloud` CLI installed:
 
@@ -157,41 +188,143 @@ GOOGLE_PROJECT_ID=your-project-id
 
 ### Basic Usage
 
-Once you have completed the setup steps:
-
+**Transcribe a video file:**
 ```bash
-python transcribe_audio.py path/to/your/audio.mp3
+python main.py video.mp4
+```
+
+**Transcribe an audio file:**
+```bash
+python main.py audio.mp3
 ```
 
 The script will:
-1. Authenticate using your Application Default Credentials
-2. Upload the audio file to Google Cloud Storage
-3. Send it to the Speech-to-Text V2 API for transcription with speaker diarization
-4. Download and format the results
-5. Save the transcription locally
+1. Detect if input is video or audio
+2. Extract audio from video (if needed)
+3. Upload to Google Cloud Storage
+4. Transcribe with speaker diarization using Chirp 3
+5. Download and format results
+6. Save transcription locally
 
-### Alternative: Using Environment Variables
+### Advanced Usage
 
-If you prefer not to use a `.env` file, set the environment variables directly:
-
+**Specify language:**
 ```bash
-export GCS_BUCKET_NAME='your-bucket-name'
-export GOOGLE_PROJECT_ID='your-project-id'
-python transcribe_audio.py path/to/your/audio.mp3
+python main.py video.mp4 --language es-ES
 ```
 
-Or in one line:
+**Set speaker count:**
 ```bash
-GCS_BUCKET_NAME='your-bucket-name' GOOGLE_PROJECT_ID='your-project-id' python transcribe_audio.py audio.mp3
+python main.py audio.mp3 --min-speakers 3 --max-speakers 6
 ```
+
+**Keep extracted audio file:**
+```bash
+python main.py video.mp4 --keep-audio
+```
+
+**Override environment variables:**
+```bash
+python main.py video.mp4 --bucket my-bucket --project my-project-id
+```
+
+**Get help:**
+```bash
+python main.py --help
+```
+
+### Supported File Formats
+
+**Video formats:**
+- MP4, AVI, MOV, MKV, FLV, WMV, WebM, M4V, MPG, MPEG, 3GP, OGV
+
+**Audio formats:**
+- MP3, WAV, FLAC, M4A, AAC, OGG, WMA, Opus, AMR
+
+### Language Codes
+
+Common language codes for transcription:
+- `en-US` - English (US)
+- `en-GB` - English (UK)
+- `es-ES` - Spanish (Spain)
+- `fr-FR` - French
+- `de-DE` - German
+- `ja-JP` - Japanese
+- `zh-CN` - Chinese (Simplified)
+
+See full list: https://cloud.google.com/speech-to-text/docs/speech-to-text-supported-languages
 
 ## Output
 
 The script will:
-1. Display the transcription in the console, segmented by speaker
-2. Save the transcription to a text file named `<audio_filename>_transcription.txt`
+1. Display progress and status messages
+2. Show the transcription in the console, segmented by speaker
+3. Save the transcription to a text file named `<filename>_transcription.txt`
 
-Example output:
+### Example Session
+
+```bash
+$ python main.py interview.mp4
+
+================================================================================
+🎬 Processing: interview.mp4
+================================================================================
+
+📹 Detected video file: interview.mp4
+🎵 Extracting audio from video...
+
+Extracting audio from video: interview.mp4
+Output audio file: interview.mp3
+✓ Audio extracted successfully: interview.mp3
+
+🎤 Starting transcription with speaker diarization...
+
+✓ Authentication found
+Uploading interview.mp3 to gs://my-bucket/audio-files/1763191807_interview.mp3...
+File uploaded successfully to gs://my-bucket/audio-files/1763191807_interview.mp3
+
+================================================================================
+Processing audio file: gs://my-bucket/audio-files/1763191807_interview.mp3
+Using Chirp 3 model for improved accuracy...
+Sending batch recognition request to Google Speech-to-Text V2 API...
+This may take a while depending on the audio file size...
+Waiting for operation to complete...
+
+Batch recognition completed!
+Results saved to: gs://my-bucket/transcripts/1763191807_interview
+Downloading transcription results from gs://my-bucket/transcripts/1763191807_interview...
+Processing transcripts/1763191807_interview/interview_transcript_abc123.json...
+
+================================================================================
+TRANSCRIPTION WITH SPEAKER DIARIZATION (Chirp 3 Model)
+================================================================================
+
+Speaker 1:
+Hello, thanks for joining us today. Can you tell us about your background?
+
+Speaker 2:
+Sure, I'd be happy to. I have over 10 years of experience in software development.
+
+Speaker 1:
+That's impressive. What technologies do you specialize in?
+
+Speaker 2:
+I mainly work with Python, JavaScript, and cloud technologies like Google Cloud and AWS.
+
+
+Transcription saved locally to: interview_transcription.txt
+================================================================================
+
+================================================================================
+✅ SUCCESS!
+================================================================================
+📄 Transcription saved to: interview_transcription.txt
+☁️  GCS URI: gs://my-bucket/audio-files/1763191807_interview.mp3
+📁 GCS Output: gs://my-bucket/transcripts/1763191807_interview
+================================================================================
+```
+
+### Example output file:
 ```
 ================================================================================
 TRANSCRIPTION WITH SPEAKER DIARIZATION
@@ -216,6 +349,44 @@ I'm doing well too. Let's discuss the project details.
 5. **Download**: Retrieves the transcription results from Cloud Storage
 6. **Format**: Organizes the transcript by speaker segments
 7. **Save**: Saves the formatted transcription to a local text file
+
+## Project Structure
+
+```
+.
+├── main.py                      # Main entry point
+├── services/
+│   ├── __init__.py             # Services package
+│   ├── audio_extractor.py      # Video to audio extraction service
+│   └── transcription_service.py # Audio transcription service
+├── transcribe_audio.py         # Legacy script (kept for backward compatibility)
+├── requirements.txt            # Python dependencies
+├── .env                        # Environment variables (create from .env.example)
+├── .env.example               # Example environment file
+├── README.md                  # This file
+└── SETUP_GUIDE.md            # Quick setup guide
+```
+
+### Services
+
+**Audio Extractor** (`services/audio_extractor.py`)
+- Extracts audio from video files using FFmpeg
+- Supports multiple video formats
+- Configurable audio quality and format
+- Can be used standalone
+
+**Transcription Service** (`services/transcription_service.py`)
+- Handles Google Cloud Speech-to-Text V2 API integration
+- Speaker diarization with Chirp 3 model
+- GCS upload and result retrieval
+- Formats transcription with speaker labels
+- Can be used standalone
+
+**Main Script** (`main.py`)
+- Integrates both services
+- CLI interface with argparse
+- Automatic file type detection
+- Error handling and validation
 
 ## Authentication Method
 

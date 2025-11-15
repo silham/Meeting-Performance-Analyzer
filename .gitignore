@@ -44,3 +44,7 @@ Thumbs.db
 *.mp3
 *.wav
 *.flac
+
+# Video files
+*.mp4
+*.mov
