@@ -7,12 +7,15 @@ Main entry point for transcribing audio from video files or audio files directly
 import os
 import sys
 import argparse
+import uuid
 from pathlib import Path
 from dotenv import load_dotenv
+
 
 # Import our services
 from services.audio_extractor import extract_audio_from_video
 from services.transcription_service import transcribe_audio
+from services.silence_remover import remove_silence
 
 # Load environment variables
 load_dotenv()
@@ -97,6 +100,7 @@ def process_file(file_path, bucket_name, project_id,
     elif is_audio_file(file_path):
         print(f"🎵 Detected audio file: {file_path}\n")
     
+    
     else:
         raise ValueError(
             f"Unsupported file format: {Path(file_path).suffix}\n"
@@ -104,6 +108,14 @@ def process_file(file_path, bucket_name, project_id,
             "  Video: .mp4, .avi, .mov, .mkv, .flv, .wmv, .webm, etc.\n"
             "  Audio: .mp3, .wav, .flac, .m4a, .aac, .ogg, etc."
         )
+
+    # Remove silence before transcription
+    print("🤫 Removing silent parts from audio...\n")
+    try:
+        output_audio_path = f"{Path(audio_file_path).stem}_nosilence.mp3"
+        audio_file_path = remove_silence(audio_file_path, output_audio_path)
+    except Exception as e:
+        raise RuntimeError(f"Failed to remove silence: {str(e)}")
     
     # Transcribe the audio
     print("🎤 Starting transcription with speaker diarization...\n")
