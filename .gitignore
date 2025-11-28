@@ -48,3 +48,10 @@ Thumbs.db
 # Video files
 *.mp4
 *.mov
+
+# FastAPI uploads and results
+uploads/
+results/
+
+# Logs
+*.log

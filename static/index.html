@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Performance Analyzer</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Meeting Performance Analyzer</h1>
+            <p class="subtitle">Transcribe audio from video/audio files with AI-powered speaker diarization</p>
+        </header>
+
+        <!-- Upload Section -->
+        <div class="card">
+            <h2>📤 Upload File</h2>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="fileInput" class="file-label">
+                        <span class="file-icon">📁</span>
+                        <span id="fileName">Choose video or audio file</span>
+                        <input type="file" id="fileInput" name="file" accept="video/*,audio/*" required>
+                    </label>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="languageCode">Language:</label>
+                        <select id="languageCode" name="language_code">
+                            <option value="en-US">English (US)</option>
+                            <option value="en-GB">English (UK)</option>
+                            <option value="es-ES">Spanish</option>
+                            <option value="fr-FR">French</option>
+                            <option value="de-DE">German</option>
+                            <option value="ja-JP">Japanese</option>
+                            <option value="zh-CN">Chinese (Simplified)</option>
+                            <option value="ar-SA">Arabic</option>
+                            <option value="hi-IN">Hindi</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="minSpeakers">Min Speakers:</label>
+                        <input type="number" id="minSpeakers" name="min_speakers" min="1" max="10" value="2">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="maxSpeakers">Max Speakers:</label>
+                        <input type="number" id="maxSpeakers" name="max_speakers" min="1" max="10" value="5">
+                    </div>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" id="keepAudio" name="keep_audio">
+                        Keep extracted audio file (for videos)
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <span class="btn-icon">🚀</span>
+                    Start Transcription
+                </button>
+            </form>
+
+            <div id="uploadProgress" class="progress-container" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <p id="progressText">Uploading...</p>
+            </div>
+        </div>
+
+        <!-- Jobs List Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2>📋 Transcription Jobs</h2>
+                <button class="btn btn-secondary" id="refreshBtn" onclick="loadJobs()">
+                    <span class="btn-icon">🔄</span>
+                    Refresh
+                </button>
+            </div>
+            
+            <div id="jobsList" class="jobs-list">
+                <p class="text-muted">No jobs yet. Upload a file to get started!</p>
+            </div>
+        </div>
+
+        <!-- Transcription Result Modal -->
+        <div id="resultModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>📄 Transcription Result</h2>
+                    <button class="close-btn" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="result-actions">
+                        <button class="btn btn-secondary" onclick="copyTranscription()">
+                            <span class="btn-icon">📋</span>
+                            Copy
+                        </button>
+                        <button class="btn btn-primary" id="downloadBtn">
+                            <span class="btn-icon">💾</span>
+                            Download
+                        </button>
+                    </div>
+                    <pre id="transcriptionContent" class="transcription-content"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Powered by Google Cloud Speech-to-Text V2 API with Chirp 3 Model</p>
+    </footer>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
