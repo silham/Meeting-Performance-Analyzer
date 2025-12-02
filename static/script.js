@@ -4,14 +4,24 @@ const API_URL = window.location.origin;
 // Current job ID for tracking
 let currentJobId = null;
 let pollInterval = null;
+window.isLoadingJobs = false; // Prevent overlapping requests
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     loadJobs();
     
-    // Auto-refresh jobs every 5 seconds
-    setInterval(loadJobs, 5000);
+    // Auto-refresh jobs every 5 seconds, only if jobs exist
+    pollInterval = setInterval(async () => {
+        const jobsList = document.getElementById('jobsList');
+        const hasJobs = jobsList && jobsList.children.length > 0;
+
+        if (hasJobs && !window.isLoadingJobs) {
+            window.isLoadingJobs = true;
+            await loadJobs();
+            window.isLoadingJobs = false;
+        }
+    }, 5000);
 });
 
 function setupEventListeners() {
