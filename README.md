@@ -354,17 +354,35 @@ I'm doing well too. Let's discuss the project details.
 
 ```
 .
-├── main.py                      # Main entry point
-├── services/
-│   ├── __init__.py             # Services package
-│   ├── audio_extractor.py      # Video to audio extraction service
-│   └── transcription_service.py # Audio transcription service
-├── transcribe_audio.py         # Legacy script (kept for backward compatibility)
-├── requirements.txt            # Python dependencies
-├── .env                        # Environment variables (create from .env.example)
-├── .env.example               # Example environment file
-├── README.md                  # This file
-└── SETUP_GUIDE.md            # Quick setup guide
+├── app/
+│   ├── main.py                     # FastAPI entrypoint
+│   ├── routers/                    # API routes
+│   │   ├── health.py
+│   │   ├── jobs.py
+│   │   └── transcribe.py
+│   ├── background/
+│   │   └── processor.py            # Background task engine
+│   ├── services/
+│   │   ├── audio_extractor.py
+│   │   └── transcription_service.py
+│   ├── utils/
+│   │   ├── file_utils.py
+│   │   └── job_utils.py
+│   └── models/
+│       └── job_models.py           # Pydantic models
+│
+├── uploads/                        # Temporary input files
+├── results/                        # Final transcription JSON/text
+│
+├── static/
+│   ├── index.html
+│   ├── script.js
+│   └── styles.css
+│
+├── requirements.txt
+├── start.sh
+├── .env
+└── README_WEBAPP.md (this file)
 ```
 
 ### Services
