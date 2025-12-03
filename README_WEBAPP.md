@@ -51,22 +51,36 @@ A modern web application for transcribing audio from video/audio files with AI-p
 
 ```
 .
-├── app.py                          # FastAPI application
-├── main.py                         # CLI tool (legacy)
-├── start.sh                        # Startup script
-├── requirements.txt                # Python dependencies
-├── .env                           # Environment variables
-├── services/
-│   ├── __init__.py
-│   ├── audio_extractor.py         # Video → Audio extraction
-│   └── transcription_service.py   # Audio → Text transcription
+├── app/
+│   ├── main.py                     # FastAPI entrypoint
+│   ├── routers/                    # API routes
+│   │   ├── health.py
+│   │   ├── jobs.py
+│   │   └── transcribe.py
+│   ├── background/
+│   │   └── processor.py            # Background task engine
+│   ├── services/
+│   │   ├── audio_extractor.py
+│   │   └── transcription_service.py
+│   ├── utils/
+│   │   ├── file_utils.py
+│   │   └── job_utils.py
+│   └── models/
+│       └── job_models.py           # Pydantic models
+│
+├── uploads/                        # Temporary input files
+├── results/                        # Final transcription JSON/text
+│
 ├── static/
-│   ├── index.html                 # Main web interface
-│   ├── styles.css                 # Styling
-│   └── script.js                  # Frontend logic
-├── uploads/                       # Temporary file uploads
-├── results/                       # Transcription results
-└── README_WEBAPP.md              # This file
+│   ├── index.html
+│   ├── script.js
+│   └── styles.css
+│
+├── requirements.txt
+├── start.sh
+├── .env
+└── README_WEBAPP.md (this file)
+
 ```
 
 ## 🚀 Quick Start
@@ -137,7 +151,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # Start server
-uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 The application will be available at:
